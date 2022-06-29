@@ -1,42 +1,26 @@
 const post = require("../sql-controller")
+const QueryFormat = require("../share/sqlformat")
 
 class Users {
-    async createUser(req, res) {  
+    async createUser(req, res) {
         const {name, surname, patronymic, email, mobile, birth} = req.body
         const Client = await post.query({text: 'insert into m_clients (sname, name, pname, email, mobile, birth) values ($1,$2,$3,$4,$5,$6) returning *;', values: [surname, name, patronymic, email, mobile, birth]})
         res.send(Client.rows[0])
     }
     
     async getUsers(req, res) {
-        const {surname, name, patronymic, email, mobile} = req.body
-        
-        const value = []
-        for(let v of [surname, name, patronymic, email, mobile]) {
-            if (v) value.push(v)
-        }
-        let i = 0
+        const Query = QueryFormat(req, ['sname', 'name', 'pname', 'email', 'mobile'])
 
-                const q1 = (surname ? 'sname = $'+ (++i) :'') + (name ? (i!=0?' and ':'')+'name = $'+ (++i) : '') + (patronymic ? (i!=0?' and ':'')+'pname = $'+ (++i) : '') + (email ? (i!=0?' and ':'')+'email = $'+ (++i) : '') + (mobile ? (i!=0?' and ':'')+'mobile = $'+ (++i) : '')
-        const Client = await post.query({text: 'select * from m_clients'+ (i != 0 ? ' where '+q1:'') + ';', values: value})
+        const Client = await post.query({text: 'select * from m_clients' + Query.sql, values: Query.value})
         res.send(Client.rows)
     }
 
     async updateUser(req, res) {
-        const {id, name, sname, pname, email, mobile, birth} = req.body
-
-        const value = []
-        for(let v of [name, sname, pname, email, mobile, birth, id]) {
-            if (v) value.push(v)
-        }
-
-        if (value.length < 2)
-            return res.send(res.send({state: false, cause: 'nothing', def: 'No items to change'}))
-
-        let i = 0
+        const Query = QueryFormat(req, ['id', 'name', 'sname', 'pname', 'email', 'mobile', 'birth'], 0, ['id'])
+        if (!Query.state) return res.send(Query)
         
-        const q1 = (name?'name=$'+(++i):'') + (sname?((i!=0?', ':'')+'sname=$'+(++i)):'') + (pname?((i!=0?', ':'')+'pname=$'+(++i)):'') + (email?((i!=0?', ':'')+'email=$'+(++i)):'') + (mobile?((i!=0?', ':'')+'mobile=$'+(++i)):'')+ (birth?((i!=0?', ':'')+'birth=$'+(++i)):'')
-        const Clients = await post.query({text: 'update m_clients set '+q1+' where id = $'+(++i)+' returning *;', values: value})
-        res.end(Clients.rows[0])
+        const Clients = await post.query({text: 'update m_clients set '+ Query.sql +' returning *;', values: Query.value})
+        res.send(Clients.rows[0])
     }
 
     async deleteUser(req, res) {
