@@ -21,5 +21,5 @@ module.exports = (req, ar, valQ = 0, arupd) => {
             return {state: false, cause: 'idupdate', def: 'No id numbers'}
 
         Query = Query.query + Query.where
-        return {sql: Query, value: value, count: valQ}
+        return {state: true, sql: Query, value: value, count: valQ}
 }

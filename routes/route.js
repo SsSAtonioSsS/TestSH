@@ -32,6 +32,8 @@ route.get('/basket', (req, res) => order.getBasket(req, res))
 route.put('/basket', (req, res) => order.toBasket(req, res))
 route.delete('/basket', (req, res) => order.deleteBasketItem(req, res))
 
+route.get('/orders', (req, res) => order.getOrders(req, res))
+
 route.get('/order', (req, res) => order.getOrder(req, res))
 route.put('/order', (req, res) => order.createOrder(req, res))
 route.post('/order', (req, res) => order.addItemToOrder(req, res))

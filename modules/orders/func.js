@@ -122,8 +122,8 @@ class Orders {
             
             let nums = []
             Itms.forEach(k => {nums.push(k.id_item)});
-         
-            let onitems = await post.query({text: 'select id, count from m_item_names where id in ($1) order by id asc', values: [String(nums)]})
+
+            let onitems = await post.query({text: 'select id, count from m_item_names where id in ('+nums+') order by id asc'})    
             nums = null;
             onitems = onitems.rows
 
@@ -140,6 +140,11 @@ class Orders {
             return {state: true, def: 'Copied if available'}
         }
 
+        async getOrders(req, res) {
+            const {client_id} = req.body
+            const Orders = await post.query({text: 'select * from m_order where id_client = $1', values: [client_id]})
+            return res.send(Orders.rows)
+        }
         async getOrder(req, res)
         {
             const {id} = req.body
@@ -262,7 +267,7 @@ class Orders {
             if (Cancel.rows[0].canceled)
                 return res.send({state: false, cause: 'canceled', def: 'Order was canceled'})
 
-            const Delivered = await post.query({text: 'update m_order set delivery_date = '+ (delivery_date?'$2':'now()') +' where id = $1 returning *;', values: (delivery_date?[order_id]:[order_id, delivery_date])})
+            const Delivered = await post.query({text: 'update m_order set delivery_date = '+ (delivery_date?'$2':'now()') +' where id = $1 returning *;', values: (delivery_date?[order_id, delivery_date]:[order_id])})
             return res.send(Delivered.rows[0])
         }
     //

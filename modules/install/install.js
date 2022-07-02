@@ -2,7 +2,7 @@ const post = require("../sql-controller")
 
 module.exports = async (req, res) => {
     let rs = 0
-    await post.query("create table if not exists m_clients(id serial primary key, sname  varchar(100) not null, name varchar(100) not null, pname varchar(100), email varchar(100) not null, mobile numeric(10) not null, birth date not null);") ? rs++:'';
+    await post.query("create table if not exists m_clients(id serial primary key, sname  varchar(100) not null, name varchar(100) not null, pname varchar(100), email varchar(100) not null, mobile numeric(10) not null unique, birth date not null);") ? rs++:'';
     await post.query("create table if not exists m_item_categories(id serial primary key,name varchar(50) not null);") ? rs++:'';
     await post.query("create table if not exists m_item_names(id serial primary key,id_cat int not null,name varchar(100) not null,cost money not null,count int default 0,defen jsonb null,foreign key(id_cat) references m_item_categories(id));") ? rs++:'';
     await post.query("create table if not exists m_item_move(id serial primary key,id_item int not null,offs int not null,foreign key(id_item) references m_item_names(id));") ? rs++:'';

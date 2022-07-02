@@ -5,7 +5,7 @@ create table if not exists m_clients(
     name varchar(100) not null,
     pname varchar(100),
     email varchar(100) not null,
-    mobile numeric(10) not null,
+    mobile numeric(10) not null unique,
     birth date not null
 );
 

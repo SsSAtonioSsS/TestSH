@@ -6,7 +6,7 @@ class Store {
     async createCategory(req, res) {
         const {name} = req.body  
         const Category = await post.query({text: 'insert into m_item_categories (name) values ($1) returning *;', values: [name]})
-        res.send(Category)
+        res.send(Category.rows[0])
     }
 
     async getCategory(req, res) {
@@ -21,7 +21,7 @@ class Store {
         if (!Query.state) return res.send(Query)
         
         const Category = await post.query({text: 'update m_item_categories set '+Query.sql+' returning *;', values: Query.value})
-        res.send(Category)
+        res.send(Category.rows[0])
     }
 
     async deleteCategory(req, res) {
